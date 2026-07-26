@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="NexStudio outreach draft review desk."
+    />
+    <title>NexStudio Outreach Desk</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">N</div>
+          <div>
+            <p>NexStudio</p>
+            <h1>Outreach Desk</h1>
+          </div>
+        </div>
+
+        <div class="run-summary" aria-label="Campaign summary">
+          <span><strong id="leadTotal">0</strong> leads</span>
+          <span><strong id="draftTotal">0</strong> drafts</span>
+          <span><strong id="directTotal">0</strong> direct</span>
+          <span><strong id="inboxTotal">0</strong> inbox</span>
+          <span class="status-dot">Review ready</span>
+        </div>
+      </header>
+
+      <div class="toolbar">
+        <label class="search-control" for="leadSearch">
+          <i data-lucide="search" aria-hidden="true"></i>
+          <input
+            id="leadSearch"
+            type="search"
+            placeholder="Search company or contact"
+            autocomplete="off"
+          />
+        </label>
+
+        <label class="select-control" for="segmentFilter">
+          <span>Segment</span>
+          <select id="segmentFilter">
+            <option value="all">All</option>
+            <option value="agency_owner">Agencies</option>
+            <option value="coach">Coaches</option>
+            <option value="small_business">Small business</option>
+          </select>
+        </label>
+
+        <label class="select-control" for="recipientFilter">
+          <span>Recipient</span>
+          <select id="recipientFilter">
+            <option value="all">All</option>
+            <option value="decision_maker">Decision makers</option>
+            <option value="business_inbox">Business inboxes</option>
+          </select>
+        </label>
+      </div>
+
+      <main class="workspace">
+        <aside class="lead-pane" aria-label="Reviewed leads">
+          <div class="pane-heading">
+            <h2>Reviewed leads</h2>
+            <span id="filteredCount">0</span>
+          </div>
+          <div id="leadList" class="lead-list"></div>
+        </aside>
+
+        <section class="draft-pane" aria-live="polite">
+          <div id="emptyState" class="empty-state" hidden>
+            <i data-lucide="inbox" aria-hidden="true"></i>
+            <h2>No matching leads</h2>
+          </div>
+
+          <div id="draftContent">
+            <div class="company-header">
+              <div class="company-identity">
+                <div class="company-avatar">
+                  <img id="companyFavicon" alt="" />
+                  <span id="companyInitials" aria-hidden="true"></span>
+                </div>
+                <div>
+                  <p id="companySegment" class="eyebrow"></p>
+                  <h2 id="companyName"></h2>
+                  <p id="contactLine" class="contact-line"></p>
+                </div>
+              </div>
+              <a
+                id="websiteLink"
+                class="icon-button"
+                href="#"
+                target="_blank"
+                rel="noreferrer"
+                title="Open company website"
+                aria-label="Open company website"
+              >
+                <i data-lucide="external-link" aria-hidden="true"></i>
+              </a>
+            </div>
+
+            <div class="signal-strip">
+              <div>
+                <span>Offer</span>
+                <strong id="offerName"></strong>
+              </div>
+              <div>
+                <span>Range</span>
+                <strong id="priceRange"></strong>
+              </div>
+              <div>
+                <span>Location</span>
+                <strong id="location"></strong>
+              </div>
+              <div>
+                <span>Lead score</span>
+                <strong id="leadScore"></strong>
+              </div>
+            </div>
+
+            <div class="observation-band">
+              <i data-lucide="scan-search" aria-hidden="true"></i>
+              <div>
+                <span id="auditLabel">Website signal</span>
+                <p id="observation"></p>
+              </div>
+            </div>
+
+            <div
+              id="draftTabs"
+              class="draft-tabs"
+              role="tablist"
+              aria-label="Email drafts"
+            ></div>
+
+            <div id="researchState" class="research-state" hidden>
+              <i data-lucide="shield-alert" aria-hidden="true"></i>
+              <div>
+                <strong>Research required</strong>
+                <p>No email was generated because the live-page evidence is incomplete.</p>
+              </div>
+            </div>
+
+            <article id="emailEditor" class="email-editor">
+              <div class="email-field">
+                <span>To</span>
+                <strong id="emailTo"></strong>
+              </div>
+              <div class="email-field subject-field">
+                <span>Subject</span>
+                <strong id="emailSubject"></strong>
+                <button
+                  id="copySubject"
+                  class="icon-button compact"
+                  type="button"
+                  title="Copy subject"
+                  aria-label="Copy subject"
+                >
+                  <i data-lucide="copy" aria-hidden="true"></i>
+                </button>
+              </div>
+              <div id="emailBody" class="email-body"></div>
+              <div class="email-actions">
+                <span id="draftPosition"></span>
+                <button id="copyDraft" class="primary-button" type="button">
+                  <i data-lucide="copy" aria-hidden="true"></i>
+                  Copy draft
+                </button>
+              </div>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script src="./data.js"></script>
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

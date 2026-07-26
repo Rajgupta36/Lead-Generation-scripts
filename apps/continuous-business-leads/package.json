@@ -1,0 +1,7 @@
+{
+  "name": "@leadgen/continuous-business-leads",
+  "private": true,
+  "scripts": {
+    "generate": "python3 ../../scripts/run-continuous-workflow.py --workflow businesses"
+  }
+}

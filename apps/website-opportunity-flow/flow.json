@@ -1,0 +1,12 @@
+{
+  "name": "Website opportunity signal flow",
+  "args": {
+    "provider": "serper",
+    "query": "(\"powered by wix\" OR \"weebly\" OR \"under construction\" OR \"copyright 2018\" OR \"wordpress.com\") (\"dentist\" OR \"salon\" OR \"law firm\" OR \"med spa\") (\"contact\" OR \"book online\")",
+    "segment": "small_business",
+    "max_results_per_query": 100,
+    "max_followup_pages": 3,
+    "crawl_workers": 4,
+    "out": "data/output-website-opportunity-flow"
+  }
+}

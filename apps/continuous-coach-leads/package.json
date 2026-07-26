@@ -1,0 +1,7 @@
+{
+  "name": "@leadgen/continuous-coach-leads",
+  "private": true,
+  "scripts": {
+    "generate": "python3 ../../scripts/run-continuous-workflow.py --workflow coaches"
+  }
+}

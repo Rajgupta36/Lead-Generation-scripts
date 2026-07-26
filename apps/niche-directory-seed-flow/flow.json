@@ -1,0 +1,14 @@
+{
+  "name": "Niche directory CSV seed flow",
+  "args": {
+    "provider": "csv",
+    "search_results_file": "data/seeds/niche-directory-seeds.csv",
+    "query": "*",
+    "segment": "agency_owner",
+    "max_results_per_query": 250,
+    "max_followup_pages": 4,
+    "crawl_workers": 4,
+    "allow_junk_results": true,
+    "out": "data/output-niche-directory-seed-flow"
+  }
+}

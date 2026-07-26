@@ -1,0 +1,22 @@
+{
+  "*": [
+    {
+      "title": "Posts with replies by Avery Stone (@averybuilds) / X",
+      "url": "https://x.com/averybuilds/with_replies",
+      "snippet": "SaaS Founder at Acme. Building useful software. 835 Followers",
+      "source_provider": "file"
+    },
+    {
+      "title": "Posts with replies by Morgan Lee (@morganbuilds) / X",
+      "url": "https://x.com/morganbuilds/with_replies",
+      "snippet": "AI Founder and product builder. 1,250 Followers",
+      "source_provider": "file"
+    },
+    {
+      "title": "Avery's latest post / X",
+      "url": "https://x.com/averybuilds/status/123456789",
+      "snippet": "A post mentioning founders. 12 Likes",
+      "source_provider": "file"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+coach:
+  - '("business coach" OR "fitness coach" OR "life coach" OR "consultant") ("book a call" OR "apply now") ("email" OR "contact") "{country}"'
+  - '"high ticket coach" "book a call" contact'
+  - '"business consultant" "apply now" "LinkedIn"'
+  - '"online coach" "Instagram" contact'
+  - '("coach" OR "consultant") ("program" OR "masterclass" OR "coaching") ("book a call" OR "apply now") "{city}"'
+tutor:
+  - '("private tutor" OR "math tutor" OR "english tutor" OR "language tutor") ("book a lesson" OR "contact" OR "email") "{city}"'
+  - '("online tutor" OR "test prep tutor") ("book a call" OR "contact") "{country}"'
+  - '("tutoring business" OR "tutoring center") ("contact us" OR "book online") "{city}"'
+  - '("SAT tutor" OR "GCSE tutor" OR "IELTS tutor") ("contact" OR "book") "{country}"'
+shop_owner:
+  - '("shop owner" OR "boutique owner" OR "store owner") ("contact" OR "email" OR "Instagram") "{city}"'
+  - '("boutique" OR "fashion store" OR "jewelry store" OR "gift shop") ("shop online" OR "contact us") "{city}"'
+  - '("independent shop" OR "local shop") ("email" OR "Instagram") "{city}"'
+  - '("shopify store" OR "online store") ("founder" OR "owner") ("contact" OR "email") "{country}"'
+small_business:
+  - '("salon" OR "clinic" OR "fitness studio" OR "interior designer") ("book online" OR "contact us") ("email" OR "Instagram") "{city}"'
+  - '"luxury salon" "book online" "{city}"'
+  - '"aesthetic clinic" "Instagram" contact "{city}"'
+  - '"interior designer" portfolio email "{city}"'
+  - '"{industry}" "{city}" ("book online" OR "contact us" OR "email")'
+agency_owner:
+  - '("agency owner" OR "founder") ("marketing agency" OR "branding agency" OR "creative agency") ("contact" OR "email") ("{country}")'
+  - '("branding agency" OR "creative agency" OR "design agency") ("web design" OR "website design") ("contact" OR "work with us") "{city}"'
+  - '("creative agency" OR "branding studio") ("Webflow" OR "WordPress" OR "Shopify") ("contact" OR "new business") "{city}"'
+  - '("SEO agency" OR "small business marketing agency") ("founder" OR "owner") ("contact" OR "email") "{city}"'
+  - '("white label" OR "outsource" OR "partner") ("web development" OR "website development") agency contact'
+creator:
+  - '("creator" OR "YouTuber" OR "newsletter") ("course" OR "community" OR "sponsorship") ("business inquiries" OR "contact") "{country}"'
+  - '"business inquiries" "course creator"'
+  - '"newsletter creator" sponsorship'
+  - '"YouTuber" "media kit" email'
+  - '("creator" OR "personal brand") ("course" OR "paid community" OR "digital products") contact'

@@ -1,0 +1,14 @@
+{
+  "name": "Lookalike seed CSV flow",
+  "args": {
+    "provider": "csv",
+    "search_results_file": "data/seeds/lookalike-seeds.csv",
+    "query": "*",
+    "segment": "small_business",
+    "max_results_per_query": 250,
+    "max_followup_pages": 4,
+    "crawl_workers": 4,
+    "allow_junk_results": true,
+    "out": "data/output-lookalike-seed-flow"
+  }
+}
