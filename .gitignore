@@ -12,5 +12,6 @@ __pycache__/
 
 data/
 apps/outreach-draft-review/data.js
+!apps/outreach-draft-review/data.js
 
 *.log

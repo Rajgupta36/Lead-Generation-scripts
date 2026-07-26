@@ -131,6 +131,14 @@ select:focus-visible {
   background: #65c28d;
 }
 
+.workflow-link {
+  color: #d8f0df;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .toolbar {
   display: flex;
   align-items: center;
