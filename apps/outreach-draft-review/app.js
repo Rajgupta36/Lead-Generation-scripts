@@ -39,6 +39,10 @@
     copyWebsite: document.getElementById("copyWebsite"),
     copyClient: document.getElementById("copyClient"),
     copyCountry: document.getElementById("copyCountry"),
+    emailValue: document.getElementById("emailValue"),
+    websiteValue: document.getElementById("websiteValue"),
+    clientValue: document.getElementById("clientValue"),
+    countryValue: document.getElementById("countryValue"),
     observation: document.getElementById("observation"),
     auditLabel: document.getElementById("auditLabel"),
     draftTabs: document.getElementById("draftTabs"),
@@ -197,10 +201,10 @@
       [lead.city, lead.country].filter(Boolean).join(", ") || "—";
     elements.leadScore.textContent = lead.lead_score || "—";
     elements.leadTags.textContent = [segmentLabel(lead.segment), recipientLabel(lead.recipient_type)].join(" · ");
-    elements.copyEmail.textContent = lead.email || "—";
-    elements.copyWebsite.textContent = lead.website || "—";
-    elements.copyClient.textContent = lead.business_name || "—";
-    elements.copyCountry.textContent = lead.country || "—";
+    elements.emailValue.value = lead.email || "—";
+    elements.websiteValue.value = lead.website || "—";
+    elements.clientValue.value = lead.business_name || "—";
+    elements.countryValue.value = lead.country || "—";
     elements.copyEmail.disabled = !lead.email;
     elements.copyWebsite.disabled = !lead.website;
     elements.copyClient.disabled = !lead.business_name;
