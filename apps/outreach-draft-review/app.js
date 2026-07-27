@@ -152,10 +152,22 @@
             : `Business inbox · ${segmentLabel(lead.segment)}`;
         copy.append(company, person);
 
-        const score = document.createElement("span");
-        score.className = "lead-score";
-        score.textContent = lead.lead_score || "—";
-        button.append(icon, copy, score);
+        const tags = document.createElement("span");
+        tags.className = "lead-cell lead-tags";
+        tags.textContent = segmentLabel(lead.segment);
+        const country = document.createElement("span");
+        country.className = "lead-cell";
+        country.textContent = lead.country || "—";
+        const location = document.createElement("span");
+        location.className = "lead-cell";
+        location.textContent = lead.city || "—";
+        const email = document.createElement("span");
+        email.className = "lead-cell lead-email";
+        email.textContent = lead.email || "—";
+        const offer = document.createElement("span");
+        offer.className = "lead-cell lead-offer";
+        offer.textContent = lead.price_range || lead.recommended_offer || "—";
+        button.append(icon, copy, tags, country, location, email, offer);
         return button;
       }),
     );
