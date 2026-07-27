@@ -34,6 +34,11 @@
     priceRange: document.getElementById("priceRange"),
     location: document.getElementById("location"),
     leadScore: document.getElementById("leadScore"),
+    leadTags: document.getElementById("leadTags"),
+    copyEmail: document.getElementById("copyEmail"),
+    copyWebsite: document.getElementById("copyWebsite"),
+    copyClient: document.getElementById("copyClient"),
+    copyCountry: document.getElementById("copyCountry"),
     observation: document.getElementById("observation"),
     auditLabel: document.getElementById("auditLabel"),
     draftTabs: document.getElementById("draftTabs"),
@@ -179,6 +184,15 @@
     elements.location.textContent =
       [lead.city, lead.country].filter(Boolean).join(", ") || "—";
     elements.leadScore.textContent = lead.lead_score || "—";
+    elements.leadTags.textContent = [segmentLabel(lead.segment), recipientLabel(lead.recipient_type)].join(" · ");
+    elements.copyEmail.textContent = lead.email || "—";
+    elements.copyWebsite.textContent = lead.website || "—";
+    elements.copyClient.textContent = lead.business_name || "—";
+    elements.copyCountry.textContent = lead.country || "—";
+    elements.copyEmail.disabled = !lead.email;
+    elements.copyWebsite.disabled = !lead.website;
+    elements.copyClient.disabled = !lead.business_name;
+    elements.copyCountry.disabled = !lead.country;
     elements.observation.textContent =
       lead.specific_observation || "Website opportunity ready for review.";
     elements.auditLabel.textContent =
@@ -311,6 +325,26 @@
     state.selectedEmail = button.dataset.email;
     state.draftIndex = 0;
     render();
+  });
+
+  elements.copyEmail.addEventListener("click", () => {
+    const lead = currentLead(filteredLeads());
+    if (lead?.email) copyText(lead.email, "Email copied");
+  });
+
+  elements.copyWebsite.addEventListener("click", () => {
+    const lead = currentLead(filteredLeads());
+    if (lead?.website) copyText(lead.website, "Website URL copied");
+  });
+
+  elements.copyClient.addEventListener("click", () => {
+    const lead = currentLead(filteredLeads());
+    if (lead?.business_name) copyText(lead.business_name, "Client name copied");
+  });
+
+  elements.copyCountry.addEventListener("click", () => {
+    const lead = currentLead(filteredLeads());
+    if (lead?.country) copyText(lead.country, "Country copied");
   });
 
   elements.draftTabs.addEventListener("click", (event) => {

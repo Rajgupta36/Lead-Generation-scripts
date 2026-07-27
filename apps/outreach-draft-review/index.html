@@ -130,12 +130,19 @@
                 <strong id="location"></strong>
               </div>
               <div>
-                <span>Lead score</span>
-                <strong id="leadScore"></strong>
+                <span>Tags</span>
+                <strong id="leadTags"></strong>
               </div>
             </div>
 
-            <div class="observation-band">
+            <div class="compact-details" aria-label="Lead details">
+              <div class="detail-row"><span>Client</span><button type="button" class="copy-value" id="copyClient" data-copy-field="business_name"></button></div>
+              <div class="detail-row"><span>Country</span><button type="button" class="copy-value" id="copyCountry" data-copy-field="country"></button></div>
+              <div class="detail-row"><span>Email</span><button type="button" class="copy-value" id="copyEmail" data-copy-field="email"></button></div>
+              <div class="detail-row"><span>Website</span><button type="button" class="copy-value" id="copyWebsite" data-copy-field="website"></button></div>
+            </div>
+
+            <div class="observation-band clutter-detail">
               <i data-lucide="scan-search" aria-hidden="true"></i>
               <div>
                 <span id="auditLabel">Website signal</span>
@@ -158,7 +165,7 @@
               </div>
             </div>
 
-            <article id="emailEditor" class="email-editor">
+            <article id="emailEditor" class="email-editor clutter-detail">
               <div class="email-field">
                 <span>To</span>
                 <strong id="emailTo"></strong>

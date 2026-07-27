@@ -210,6 +210,42 @@ select:focus-visible {
   grid-template-columns: 310px minmax(0, 1fr);
 }
 
+.compact-details {
+  display: grid;
+  gap: 8px;
+  margin: 18px 24px 0;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.copy-value {
+  min-width: 0;
+  padding: 8px 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--surface-muted);
+  color: var(--ink);
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: copy;
+}
+
+.copy-value:hover { border-color: var(--focus); }
+
+.clutter-detail,
+#draftTabs,
+#leadScore,
+#researchState { display: none !important; }
+
 .lead-pane {
   min-height: 0;
   display: flex;
