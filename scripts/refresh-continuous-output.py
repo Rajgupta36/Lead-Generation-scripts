@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import json
+import argparse
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
@@ -41,6 +42,13 @@ INITIAL_CONTACTS = (
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--refresh-audits",
+        action="store_true",
+        help="Re-crawl every lead instead of honoring the audit TTL.",
+    )
+    args = parser.parse_args()
     config = json.loads(
         (REPO_ROOT / "config/lead-loop.json").read_text(encoding="utf-8")
     )
@@ -96,7 +104,7 @@ def main() -> int:
     }
     retain_csv_domains(audit_dir / "meeting_queue.csv", combined_domains)
     retain_csv_domains(audit_dir / "research_queue.csv", combined_domains)
-    audited_domains = {
+    audited_domains = set() if args.refresh_audits else {
         domain_key(row.get("website", ""))
         for row in (
             read_rows(audit_dir / "meeting_queue.csv")

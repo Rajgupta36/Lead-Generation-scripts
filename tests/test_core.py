@@ -372,6 +372,37 @@ class CoreTests(unittest.TestCase):
         self.assertTrue(signals.has_cta)
         self.assertTrue(signals.has_booking)
 
+    def test_meeting_inspector_extracts_page_level_template_findings(self):
+        row = {
+            "business_name": "Veraz Strategies",
+            "website": "https://veraz.test",
+            "segment": "coach",
+        }
+        homepage = """
+        <title>Veraz Strategies</title>
+        <a href="/leadership-coaching">Leadership Coaching</a>
+        <p>Executive coaching for senior leaders.</p>
+        <form><input name="email"></form>
+        """
+        leadership = """
+        <title>Leadership Coaching | Veraz Strategies</title>
+        <p>Lorem ipsum</p>
+        <h2>What you can expect</h2>
+        <span>Label</span>
+        """
+        signals = inspect_website(
+            row,
+            {
+                "https://veraz.test/": homepage,
+                "https://veraz.test/leadership-coaching": leadership,
+            },
+        )
+        self.assertEqual(signals.evidence_page, "Leadership Coaching page")
+        self.assertIn("Lorem ipsum", signals.page_findings[0])
+        self.assertIn("What you can expect", signals.page_findings[0])
+        self.assertIn("Label", signals.page_findings[0])
+        self.assertIn("enquiry form", signals.funnel_sequence)
+
     def test_coaching_service_alias_recognizes_existing_page(self):
         row = {
             "business_name": "Clear Path Coaching",

@@ -95,6 +95,25 @@ class OutreachDraftTests(unittest.TestCase):
         self.assertNotIn(" i could not verify", combined)
         self.assertIn("I could not verify", combined)
 
+    def test_specific_page_evidence_drives_human_style_copy(self):
+        audit = dict(self.audit)
+        audit.update(
+            {
+                "evidence_page": "Leadership Coaching page",
+                "page_findings": (
+                    "The Leadership Coaching page still contains Lorem ipsum sections, "
+                    "an unfinished ‘What you can expect’ area, and a placeholder labelled ‘Label’."
+                ),
+                "funnel_sequence": "homepage/service page → enquiry form → no visible booking step",
+            }
+        )
+        combined = "\n".join(draft.body for draft in generate_drafts(self.lead, audit))
+        self.assertIn("Lorem ipsum sections", combined)
+        self.assertIn("What you can expect", combined)
+        self.assertIn("six-month coaching engagement", combined)
+        self.assertIn("proposed funnel", combined)
+        self.assertNotIn("one issue on Acme Coaching's site", combined)
+
 
 if __name__ == "__main__":
     unittest.main()

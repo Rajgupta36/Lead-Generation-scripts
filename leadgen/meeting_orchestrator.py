@@ -44,6 +44,9 @@ QUEUE_FIELDS = [
     "recommended_offer",
     "price_range",
     "specific_observation",
+    "evidence_page",
+    "page_findings",
+    "funnel_sequence",
     "business_reason",
     "evidence_url",
     "evidence_summary",
@@ -95,6 +98,9 @@ class WebsiteSignals:
     has_service_page: bool = False
     has_location_page: bool = False
     has_followup_signal: bool = False
+    evidence_page: str = ""
+    page_findings: tuple[str, ...] = ()
+    funnel_sequence: str = ""
     errors: tuple[str, ...] = ()
 
 
@@ -384,6 +390,35 @@ def inspect_website(row: dict[str, str], html_by_url: dict[str, str] | None = No
     all_links = tuple(sorted(set(parser.links)))
     web_links = tuple(link for link in all_links if link.startswith(("http://", "https://")))
     internal_links = tuple(link for link in web_links if same_site(url, link))
+    page_documents = [(url, parser.title.strip(), text, html)]
+    followup_urls = [
+        link for link in internal_links
+        if link != url and len(page_documents) < 6
+    ]
+    for followup_url in followup_urls:
+        page_html = ""
+        if html_by_url:
+            page_html = html_by_url.get(followup_url, "")
+        else:
+            page_errors: list[str] = []
+            page_html = fetch_html(followup_url, page_errors)
+        if not page_html:
+            continue
+        followup_parser = SignalHTMLParser(followup_url)
+        followup_parser.feed(page_html)
+        page_documents.append(
+            (
+                followup_url,
+                followup_parser.title.strip(),
+                " ".join(followup_parser.text_parts),
+                page_html,
+            )
+        )
+    page_findings = [
+        item
+        for page_url, page_title, page_text, page_html in page_documents
+        for item in detect_page_findings(page_url, page_title, page_text, page_html)
+    ]
     visible_content = " ".join(
         [parser.title, parser.site_name, parser.description, text, " ".join(all_links)]
     )
@@ -403,6 +438,9 @@ def inspect_website(row: dict[str, str], html_by_url: dict[str, str] | None = No
     service_terms = targeted_service_terms or website_service_terms
     has_booking = contains_any(embedded_content, BOOKING_TERMS)
     has_chat = contains_any(technology, CHAT_TERMS)
+
+    evidence_page = page_findings[0][0] if page_findings else ""
+    funnel_sequence = build_funnel_sequence(parser.has_form, has_booking, has_chat, parser.has_proof)
 
     return WebsiteSignals(
         url=url,
@@ -426,6 +464,11 @@ def inspect_website(row: dict[str, str], html_by_url: dict[str, str] | None = No
         has_service_page=any(term_in_links(term, internal_links) for term in service_terms),
         has_location_page="locations" in pages_found,
         has_followup_signal=has_chat,
+        evidence_page=evidence_page,
+        page_findings=tuple(
+            finding for _page, finding in page_findings
+        ),
+        funnel_sequence=funnel_sequence,
         errors=tuple(errors),
     )
 
@@ -442,6 +485,72 @@ def fetch_html(url: str, errors: list[str]) -> str:
     except (urllib.error.URLError, TimeoutError, ValueError) as error:
         errors.append(f"fetch_failed:{error}")
         return ""
+
+
+def detect_page_findings(
+    page_url: str,
+    page_title: str,
+    visible_text: str,
+    html: str,
+) -> list[tuple[str, str]]:
+    normalized = " ".join(visible_text.split())
+    lowered = normalized.lower()
+    if not normalized:
+        return []
+    label = page_label(page_url, page_title)
+    findings: list[str] = []
+    if "lorem ipsum" in lowered:
+        findings.append("Lorem ipsum sections")
+    if "what you can expect" in lowered and (
+        "lorem ipsum" in lowered or "placeholder" in lowered or re.search(r"\bLabel\b", normalized)
+    ):
+        findings.append("an unfinished ‘What you can expect’ area")
+    if re.search(r"(?<![a-z])label(?![a-z])", lowered) and "aria-label" not in html.lower():
+        findings.append("a placeholder labelled ‘Label’")
+    for phrase in ("your content here", "coming soon", "insert text here"):
+        if phrase in lowered:
+            findings.append(f"the placeholder copy ‘{phrase}’")
+    if not findings:
+        return []
+    return [(label, f"The {label} still contains {join_findings(findings)}.")]
+
+
+def page_label(page_url: str, page_title: str) -> str:
+    path = urlparse(page_url).path.strip("/")
+    if path:
+        slug = path.rstrip("/").split("/")[-1]
+        if slug not in {"", "index", "home"}:
+            return f"{re.sub(r'[-_]+', ' ', slug).title()} page"
+    title = " ".join(page_title.split()).split("|")[0].strip()
+    return f"{title or 'Homepage'} page"
+
+
+def join_findings(findings: list[str]) -> str:
+    if len(findings) == 1:
+        return findings[0]
+    if len(findings) == 2:
+        return f"{findings[0]} and {findings[1]}"
+    return ", ".join(findings[:-1]) + f", and {findings[-1]}"
+
+
+def build_funnel_sequence(
+    has_form: bool,
+    has_booking: bool,
+    has_chat: bool,
+    has_proof: bool,
+) -> str:
+    steps = ["homepage/service page"]
+    if has_proof:
+        steps.append("proof")
+    if has_form:
+        steps.append("enquiry form")
+    if has_booking:
+        steps.append("booking")
+    elif has_chat:
+        steps.append("chat")
+    else:
+        steps.append("no visible booking step")
+    return " → ".join(steps)
 
 
 def match_offer(row: dict[str, str], signals: WebsiteSignals) -> OfferMatch:
@@ -498,6 +607,17 @@ def build_offer_match(
             observation = "The site has a next step and trust signals, but the buying path can still be simplified around one primary action."
             reason = "A more focused path can make it easier for qualified visitors to act without adding more traffic."
             show = "a marked-up homepage showing the three highest-priority conversion changes and how I would measure them"
+
+    if signals.page_findings:
+        observation = signals.page_findings[0]
+        reason = (
+            "A visible template or unfinished section creates a trust break at the point "
+            "where a qualified visitor is deciding whether to enquire."
+        )
+        show = (
+            f"the marked-up {signals.evidence_page or 'page'} and a replacement structure "
+            f"from {signals.funnel_sequence or 'the first visit'} to a qualified discovery call"
+        )
 
     return OfferMatch(
         recommended_offer=offer,
@@ -631,6 +751,9 @@ def queue_row(
         "recommended_offer": offer.recommended_offer,
         "price_range": PRICE_RANGES[offer.recommended_offer],
         "specific_observation": offer.specific_observation,
+        "evidence_page": signals.evidence_page,
+        "page_findings": " ".join(signals.page_findings),
+        "funnel_sequence": signals.funnel_sequence,
         "business_reason": offer.business_reason,
         "evidence_url": signals.url,
         "evidence_summary": evidence_summary(signals),
