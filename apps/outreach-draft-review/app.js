@@ -2,26 +2,15 @@
   "use strict";
 
   const leads = Array.isArray(window.OUTREACH_DATA) ? window.OUTREACH_DATA : [];
-  const initialLead =
-    leads.find((lead) => Array.isArray(lead.drafts) && lead.drafts.length) ||
-    leads[0] ||
-    null;
+  const initialLead = leads[0] || null;
   const state = {
     query: "",
     segment: "all",
     recipient: "all",
     country: "all",
     selectedEmail: initialLead?.email || "",
-    draftIndex: 0,
   };
-
-  const trackingKey = "nexstudio-lead-tracking-v1";
-  let tracking = {};
-  try {
-    tracking = JSON.parse(localStorage.getItem(trackingKey) || "{}");
-  } catch (_error) {
-    tracking = {};
-  }
+  const paneWidthKey = "nexstudio-lead-pane-width-v1";
 
   const elements = {
     leadTotal: document.getElementById("leadTotal"),
@@ -33,6 +22,8 @@
     segmentFilter: document.getElementById("segmentFilter"),
     recipientFilter: document.getElementById("recipientFilter"),
     countryFilter: document.getElementById("countryFilter"),
+    workspace: document.querySelector(".workspace"),
+    paneResizer: document.getElementById("paneResizer"),
     leadList: document.getElementById("leadList"),
     emptyState: document.getElementById("emptyState"),
     draftContent: document.getElementById("draftContent"),
@@ -46,27 +37,14 @@
     priceRange: document.getElementById("priceRange"),
     location: document.getElementById("location"),
     leadTags: document.getElementById("leadTags"),
-    copyEmail: document.getElementById("copyEmail"),
     copyWebsite: document.getElementById("copyWebsite"),
     copyClient: document.getElementById("copyClient"),
     copyCountry: document.getElementById("copyCountry"),
-    emailValue: document.getElementById("emailValue"),
     websiteValue: document.getElementById("websiteValue"),
     clientValue: document.getElementById("clientValue"),
     countryValue: document.getElementById("countryValue"),
-    mailDone: document.getElementById("mailDone"),
-    followupDone: document.getElementById("followupDone"),
     observation: document.getElementById("observation"),
     auditLabel: document.getElementById("auditLabel"),
-    draftTabs: document.getElementById("draftTabs"),
-    researchState: document.getElementById("researchState"),
-    emailEditor: document.getElementById("emailEditor"),
-    emailTo: document.getElementById("emailTo"),
-    emailSubject: document.getElementById("emailSubject"),
-    emailBody: document.getElementById("emailBody"),
-    draftPosition: document.getElementById("draftPosition"),
-    copySubject: document.getElementById("copySubject"),
-    copyDraft: document.getElementById("copyDraft"),
     toast: document.getElementById("toast"),
   };
 
@@ -100,7 +78,6 @@
   function currentLead(filtered) {
     return (
       filtered.find((lead) => lead.email === state.selectedEmail) ||
-      filtered.find((lead) => leadDrafts(lead).length) ||
       filtered[0] ||
       null
     );
@@ -115,7 +92,6 @@
     const lead = currentLead(filtered);
     if (lead && lead.email !== state.selectedEmail) {
       state.selectedEmail = lead.email;
-      state.draftIndex = 0;
     }
 
     elements.leadTotal.textContent = String(leads.length);
@@ -203,15 +179,12 @@
   }
 
   function renderLead(lead) {
-    const drafts = leadDrafts(lead);
-    const draft = drafts[state.draftIndex] || drafts[0];
-    const hasDraft = Boolean(draft);
     elements.companyName.textContent = lead.business_name;
     elements.companySegment.textContent = `${segmentLabel(lead.segment)} · ${recipientLabel(lead.recipient_type)}`;
     elements.contactLine.textContent =
       lead.recipient_type === "decision_maker"
-        ? `${lead.name} · ${lead.title} · ${lead.email}`
-        : `Business inbox · ${lead.email}`;
+        ? [lead.name, lead.title].filter(Boolean).join(" · ")
+        : recipientLabel(lead.recipient_type);
     renderCompanyIcon(lead);
     elements.websiteLink.href = lead.website;
     elements.offerName.textContent = lead.recommended_offer || "Growth build";
@@ -219,14 +192,9 @@
     elements.location.textContent =
       [lead.city, lead.country].filter(Boolean).join(", ") || "—";
     elements.leadTags.textContent = [segmentLabel(lead.segment), recipientLabel(lead.recipient_type)].join(" · ");
-    elements.emailValue.value = lead.email || "—";
     elements.websiteValue.value = lead.website || "—";
     elements.clientValue.value = lead.business_name || "—";
     elements.countryValue.value = lead.country || "—";
-    const leadTracking = tracking[lead.email] || {};
-    elements.mailDone.checked = Boolean(leadTracking.mailDone);
-    elements.followupDone.checked = Boolean(leadTracking.followupDone);
-    elements.copyEmail.disabled = !lead.email;
     elements.copyWebsite.disabled = !lead.website;
     elements.copyClient.disabled = !lead.business_name;
     elements.copyCountry.disabled = !lead.country;
@@ -236,36 +204,6 @@
       lead.audit_status === "research_required"
         ? "Research-level signal"
         : "Website signal";
-
-    elements.draftTabs.replaceChildren(
-      ...drafts.map((item, index) => {
-        const tab = document.createElement("button");
-        tab.type = "button";
-        tab.className = `draft-tab${index === state.draftIndex ? " active" : ""}`;
-        tab.dataset.draftIndex = String(index);
-        tab.role = "tab";
-        tab.setAttribute("aria-selected", String(index === state.draftIndex));
-        tab.textContent = `${index + 1}. ${item.label}`;
-        return tab;
-      }),
-    );
-    elements.draftTabs.hidden = !hasDraft;
-    elements.researchState.hidden = hasDraft;
-    elements.emailEditor.hidden = !hasDraft;
-    if (!hasDraft) {
-      return;
-    }
-
-    elements.emailTo.textContent = `${lead.name} <${lead.email}>`;
-    elements.emailSubject.textContent = draft.subject;
-    elements.emailBody.replaceChildren(
-      ...draft.body.split("\n\n").map((paragraph) => {
-        const node = document.createElement("p");
-        node.textContent = paragraph;
-        return node;
-      }),
-    );
-    elements.draftPosition.textContent = `Draft ${draft.number} of ${drafts.length} · ${draft.label}`;
   }
 
   async function copyText(value, successMessage) {
@@ -282,11 +220,6 @@
       textarea.remove();
     }
     showToast(successMessage);
-  }
-
-  function selectedDraft() {
-    const lead = leads.find((item) => item.email === state.selectedEmail);
-    return leadDrafts(lead)[state.draftIndex] || null;
   }
 
   let toastTimer;
@@ -306,8 +239,6 @@
       inbox: '<path d="M4 4h16v12H4z"></path><path d="M4 12h4l2 3h4l2-3h4"></path>',
       "external-link": '<path d="M14 4h6v6"></path><path d="m20 4-9 9"></path><path d="M18 13v7H4V6h7"></path>',
       "scan-search": '<path d="M3 7V3h4"></path><path d="M17 3h4v4"></path><path d="M21 17v4h-4"></path><path d="M7 21H3v-4"></path><circle cx="11" cy="11" r="4"></circle><path d="m14 14 3 3"></path>',
-      "shield-alert": '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path>',
-      copy: '<rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path>',
     };
     document.querySelectorAll("i[data-lucide]").forEach((placeholder) => {
       const name = placeholder.dataset.lucide;
@@ -378,6 +309,87 @@
     return value === "decision_maker" ? "Decision maker" : "Business inbox";
   }
 
+  function clampPaneWidth(width) {
+    const workspaceWidth = elements.workspace.getBoundingClientRect().width;
+    const minimumLeadWidth = Math.max(320, workspaceWidth * 0.3);
+    const minimumSignalWidth = 360;
+    const resizerWidth = elements.paneResizer.offsetWidth;
+    const maximumLeadWidth = Math.min(
+      workspaceWidth * 0.75,
+      workspaceWidth - minimumSignalWidth - resizerWidth,
+    );
+    return Math.max(
+      minimumLeadWidth,
+      Math.min(width, maximumLeadWidth),
+    );
+  }
+
+  function setLeadPaneWidth(width, persist = false) {
+    const nextWidth = clampPaneWidth(width);
+    elements.workspace.style.setProperty("--lead-pane-width", `${nextWidth}px`);
+    const percentage = Math.round(
+      (nextWidth / elements.workspace.getBoundingClientRect().width) * 100,
+    );
+    elements.paneResizer.setAttribute("aria-valuenow", String(percentage));
+    if (persist) {
+      try {
+        localStorage.setItem(paneWidthKey, String(nextWidth));
+      } catch (_error) {
+        // Resizing remains available for this session if storage is blocked.
+      }
+    }
+  }
+
+  function restoreLeadPaneWidth() {
+    let savedWidth = 0;
+    try {
+      savedWidth = Number(localStorage.getItem(paneWidthKey) || 0);
+    } catch (_error) {
+      savedWidth = 0;
+    }
+    if (savedWidth > 0) setLeadPaneWidth(savedWidth);
+  }
+
+  function resizeFromPointer(event) {
+    const bounds = elements.workspace.getBoundingClientRect();
+    setLeadPaneWidth(event.clientX - bounds.left);
+  }
+
+  elements.paneResizer.addEventListener("pointerdown", (event) => {
+    if (window.matchMedia("(max-width: 1100px)").matches) return;
+    elements.paneResizer.setPointerCapture(event.pointerId);
+    document.body.classList.add("is-resizing-panes");
+    resizeFromPointer(event);
+  });
+
+  elements.paneResizer.addEventListener("pointermove", (event) => {
+    if (!elements.paneResizer.hasPointerCapture(event.pointerId)) return;
+    resizeFromPointer(event);
+  });
+
+  elements.paneResizer.addEventListener("pointerup", (event) => {
+    if (!elements.paneResizer.hasPointerCapture(event.pointerId)) return;
+    elements.paneResizer.releasePointerCapture(event.pointerId);
+    document.body.classList.remove("is-resizing-panes");
+    const currentWidth = parseFloat(
+      getComputedStyle(elements.workspace).getPropertyValue("--lead-pane-width"),
+    );
+    setLeadPaneWidth(currentWidth, true);
+  });
+
+  elements.paneResizer.addEventListener("pointercancel", () => {
+    document.body.classList.remove("is-resizing-panes");
+  });
+
+  elements.paneResizer.addEventListener("keydown", (event) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    const currentWidth = elements.leadList.closest(".lead-pane").getBoundingClientRect().width;
+    if (event.key === "Home") setLeadPaneWidth(320, true);
+    else if (event.key === "End") setLeadPaneWidth(Number.MAX_SAFE_INTEGER, true);
+    else setLeadPaneWidth(currentWidth + (event.key === "ArrowLeft" ? -24 : 24), true);
+  });
+
   elements.leadSearch.addEventListener("input", (event) => {
     state.query = event.target.value;
     render();
@@ -402,13 +414,7 @@
     const button = event.target.closest(".lead-row");
     if (!button) return;
     state.selectedEmail = button.dataset.email;
-    state.draftIndex = 0;
     render();
-  });
-
-  elements.copyEmail.addEventListener("click", () => {
-    const lead = currentLead(filteredLeads());
-    if (lead?.email) copyText(lead.email, "Email copied");
   });
 
   elements.copyWebsite.addEventListener("click", () => {
@@ -426,42 +432,6 @@
     if (lead?.country) copyText(lead.country, "Country copied");
   });
 
-  function saveTracking(lead, field, value) {
-    if (!lead?.email) return;
-    tracking[lead.email] = { ...(tracking[lead.email] || {}), [field]: value };
-    try {
-      localStorage.setItem(trackingKey, JSON.stringify(tracking));
-    } catch (_error) {
-      // Tracking still remains available for this session if storage is blocked.
-    }
-  }
-
-  elements.mailDone.addEventListener("change", (event) => {
-    saveTracking(currentLead(filteredLeads()), "mailDone", event.target.checked);
-  });
-
-  elements.followupDone.addEventListener("change", (event) => {
-    saveTracking(currentLead(filteredLeads()), "followupDone", event.target.checked);
-  });
-
-  elements.draftTabs.addEventListener("click", (event) => {
-    const button = event.target.closest(".draft-tab");
-    if (!button) return;
-    state.draftIndex = Number(button.dataset.draftIndex);
-    render();
-  });
-
-  elements.copySubject.addEventListener("click", () => {
-    const draft = selectedDraft();
-    if (draft) copyText(draft.subject, "Subject copied");
-  });
-
-  elements.copyDraft.addEventListener("click", () => {
-    const draft = selectedDraft();
-    if (draft) {
-      copyText(`Subject: ${draft.subject}\n\n${draft.body}`, "Draft copied");
-    }
-  });
-
+  restoreLeadPaneWidth();
   render();
 })();

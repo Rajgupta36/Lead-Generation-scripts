@@ -205,9 +205,61 @@ select:focus-visible {
 }
 
 .workspace {
+  --lead-pane-width: 58%;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 420px;
+  grid-template-columns:
+    minmax(320px, var(--lead-pane-width))
+    12px
+    minmax(360px, 1fr);
+}
+
+.pane-resizer {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  background: var(--surface-muted);
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.pane-resizer::before {
+  content: "";
+  position: absolute;
+  inset: 0 3px;
+  border-radius: 4px;
+  background: transparent;
+  transition: background 120ms ease;
+}
+
+.pane-resizer:hover::before,
+.pane-resizer:focus-visible::before,
+body.is-resizing-panes .pane-resizer::before {
+  background: var(--green-soft);
+}
+
+.pane-resizer-grip {
+  position: relative;
+  z-index: 1;
+  width: 3px;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--line-strong);
+}
+
+.pane-resizer:hover .pane-resizer-grip,
+.pane-resizer:focus-visible .pane-resizer-grip,
+body.is-resizing-panes .pane-resizer-grip {
+  background: var(--green);
+}
+
+body.is-resizing-panes {
+  cursor: col-resize;
+  user-select: none;
 }
 
 .compact-details {
@@ -480,6 +532,7 @@ select:focus-visible {
 
 @media (max-width: 1100px) {
   .workspace { grid-template-columns: 1fr; }
+  .pane-resizer { display: none; }
   .draft-pane { border-top: 1px solid var(--line); }
   .lead-list-header { display: none; }
   .lead-row { grid-template-columns: 34px minmax(0, 1fr) auto; }
@@ -850,6 +903,10 @@ select:focus-visible {
 
   .workspace {
     display: block;
+  }
+
+  .pane-resizer {
+    display: none;
   }
 
   .lead-pane {
