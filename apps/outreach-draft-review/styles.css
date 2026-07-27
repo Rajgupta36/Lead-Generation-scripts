@@ -262,6 +262,42 @@ select:focus-visible {
 .copy-input:focus,
 .copy-button:hover { border-color: var(--focus); }
 
+.tracking-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin: 18px 24px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface-muted);
+}
+
+.tracking-label {
+  margin-right: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.tracking-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.tracking-check input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--green);
+}
+
 .clutter-detail,
 #draftTabs,
 #leadScore,

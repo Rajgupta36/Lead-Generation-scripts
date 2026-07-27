@@ -11,6 +11,14 @@
     draftIndex: 0,
   };
 
+  const trackingKey = "nexstudio-lead-tracking-v1";
+  let tracking = {};
+  try {
+    tracking = JSON.parse(localStorage.getItem(trackingKey) || "{}");
+  } catch (_error) {
+    tracking = {};
+  }
+
   const elements = {
     leadTotal: document.getElementById("leadTotal"),
     draftTotal: document.getElementById("draftTotal"),
@@ -43,6 +51,8 @@
     websiteValue: document.getElementById("websiteValue"),
     clientValue: document.getElementById("clientValue"),
     countryValue: document.getElementById("countryValue"),
+    mailDone: document.getElementById("mailDone"),
+    followupDone: document.getElementById("followupDone"),
     observation: document.getElementById("observation"),
     auditLabel: document.getElementById("auditLabel"),
     draftTabs: document.getElementById("draftTabs"),
@@ -205,6 +215,9 @@
     elements.websiteValue.value = lead.website || "—";
     elements.clientValue.value = lead.business_name || "—";
     elements.countryValue.value = lead.country || "—";
+    const leadTracking = tracking[lead.email] || {};
+    elements.mailDone.checked = Boolean(leadTracking.mailDone);
+    elements.followupDone.checked = Boolean(leadTracking.followupDone);
     elements.copyEmail.disabled = !lead.email;
     elements.copyWebsite.disabled = !lead.website;
     elements.copyClient.disabled = !lead.business_name;
@@ -361,6 +374,24 @@
   elements.copyCountry.addEventListener("click", () => {
     const lead = currentLead(filteredLeads());
     if (lead?.country) copyText(lead.country, "Country copied");
+  });
+
+  function saveTracking(lead, field, value) {
+    if (!lead?.email) return;
+    tracking[lead.email] = { ...(tracking[lead.email] || {}), [field]: value };
+    try {
+      localStorage.setItem(trackingKey, JSON.stringify(tracking));
+    } catch (_error) {
+      // Tracking still remains available for this session if storage is blocked.
+    }
+  }
+
+  elements.mailDone.addEventListener("change", (event) => {
+    saveTracking(currentLead(filteredLeads()), "mailDone", event.target.checked);
+  });
+
+  elements.followupDone.addEventListener("change", (event) => {
+    saveTracking(currentLead(filteredLeads()), "followupDone", event.target.checked);
   });
 
   elements.draftTabs.addEventListener("click", (event) => {
