@@ -3,6 +3,8 @@ import unittest
 from pathlib import Path
 
 from leadgen.continuous import (
+    ENGLISH_MARKET_COUNTRIES,
+    MARKETS,
     agency_has_forbidden_service,
     advance_state,
     advance_workflow_state,
@@ -21,7 +23,7 @@ from leadgen.continuous import (
 class ContinuousLeadTests(unittest.TestCase):
     def setUp(self):
         self.config = {
-            "regions": ["europe", "australia_nz", "north_america", "south_america"],
+            "regions": ["europe", "australia_nz", "north_america"],
             "regions_per_cycle": 2,
             "markets_per_region": 3,
         }
@@ -35,11 +37,23 @@ class ContinuousLeadTests(unittest.TestCase):
             {"agency_owner", "coach", "small_business"},
         )
 
+    def test_markets_are_english_first(self):
+        self.assertEqual(
+            {country for markets in MARKETS.values() for _, country in markets},
+            ENGLISH_MARKET_COUNTRIES - {"United States"},
+        )
+        self.assertFalse(
+            workflow_row_relevant(
+                {"country": "Brazil", "website": "https://example.test"},
+                "businesses",
+            )
+        )
+
     def test_state_rotates_regions_and_markets(self):
         state = advance_state(self.config, default_state())
         tasks = select_cycle_tasks(self.config, state)
-        self.assertEqual({task["region"] for task in tasks}, {"north_america", "south_america"})
-        self.assertEqual(state["market_cursors"]["europe"], 3)
+        self.assertEqual({task["region"] for task in tasks}, {"north_america", "europe"})
+        self.assertEqual(state["market_cursors"]["europe"], 1)
         self.assertEqual(state["market_cursors"]["australia_nz"], 3)
 
     def test_three_workflows_have_isolated_task_shapes(self):

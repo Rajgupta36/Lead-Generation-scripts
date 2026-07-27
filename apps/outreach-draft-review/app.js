@@ -6,6 +6,7 @@
     query: "",
     segment: "all",
     recipient: "all",
+    country: "all",
     selectedEmail: leads[0]?.email || "",
     draftIndex: 0,
   };
@@ -19,6 +20,7 @@
     leadSearch: document.getElementById("leadSearch"),
     segmentFilter: document.getElementById("segmentFilter"),
     recipientFilter: document.getElementById("recipientFilter"),
+    countryFilter: document.getElementById("countryFilter"),
     leadList: document.getElementById("leadList"),
     emptyState: document.getElementById("emptyState"),
     draftContent: document.getElementById("draftContent"),
@@ -53,6 +55,8 @@
         state.segment === "all" || lead.segment === state.segment;
       const matchesRecipient =
         state.recipient === "all" || lead.recipient_type === state.recipient;
+      const matchesCountry =
+        state.country === "all" || lead.country === state.country;
       const haystack = [
         lead.business_name,
         lead.name,
@@ -65,6 +69,7 @@
       return (
         matchesSegment &&
         matchesRecipient &&
+        matchesCountry &&
         (!query || haystack.includes(query))
       );
     });
@@ -292,6 +297,11 @@
 
   elements.recipientFilter.addEventListener("change", (event) => {
     state.recipient = event.target.value;
+    render();
+  });
+
+  elements.countryFilter.addEventListener("change", (event) => {
+    state.country = event.target.value;
     render();
   });
 

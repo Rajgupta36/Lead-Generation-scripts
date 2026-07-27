@@ -13,6 +13,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
 from leadgen.continuous import (
+    ENGLISH_MARKET_COUNTRIES,
     MASTER_FIELDS,
     merge_leads,
     read_rows,
@@ -86,6 +87,7 @@ def main() -> int:
     combined = [
         row
         for row in combined
+        if row.get("country", "").strip() in ENGLISH_MARKET_COUNTRIES
         if not public_sector_domain(row.get("website", ""))
         and not unsuitable_outreach_email(row.get("email", ""))
         and (

@@ -2,7 +2,7 @@
   "interval_minutes": 720,
   "audit_ttl_days": 7,
   "regions_per_cycle": 2,
-  "markets_per_region": 3,
+  "markets_per_region": 2,
   "results_per_query": 15,
   "workflow_results_per_query": {
     "businesses": 8,
@@ -20,7 +20,6 @@
   "regions": [
     "europe",
     "australia_nz",
-    "north_america",
-    "south_america"
+    "north_america"
   ]
 }

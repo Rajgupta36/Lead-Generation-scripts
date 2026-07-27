@@ -18,19 +18,6 @@ MARKETS = {
     "europe": (
         ("London", "United Kingdom"),
         ("Dublin", "Ireland"),
-        ("Berlin", "Germany"),
-        ("Paris", "France"),
-        ("Amsterdam", "Netherlands"),
-        ("Madrid", "Spain"),
-        ("Barcelona", "Spain"),
-        ("Lisbon", "Portugal"),
-        ("Stockholm", "Sweden"),
-        ("Copenhagen", "Denmark"),
-        ("Zurich", "Switzerland"),
-        ("Vienna", "Austria"),
-        ("Milan", "Italy"),
-        ("Warsaw", "Poland"),
-        ("Prague", "Czechia"),
     ),
     "australia_nz": (
         ("Sydney", "Australia"),
@@ -53,19 +40,17 @@ MARKETS = {
         ("Montreal", "Canada"),
         ("Miami", "USA"),
         ("Calgary", "Canada"),
-        ("Mexico City", "Mexico"),
     ),
-    "south_america": (
-        ("Sao Paulo", "Brazil"),
-        ("Buenos Aires", "Argentina"),
-        ("Bogota", "Colombia"),
-        ("Santiago", "Chile"),
-        ("Lima", "Peru"),
-        ("Medellin", "Colombia"),
-        ("Montevideo", "Uruguay"),
-        ("Quito", "Ecuador"),
-        ("Rio de Janeiro", "Brazil"),
-    ),
+}
+
+ENGLISH_MARKET_COUNTRIES = {
+    "USA",
+    "United States",
+    "Canada",
+    "United Kingdom",
+    "Ireland",
+    "Australia",
+    "New Zealand",
 }
 
 PUBLIC_EMAIL_DOMAINS = {
@@ -375,6 +360,8 @@ def build_workflow_query(task: dict[str, str | int]) -> str:
 
 
 def workflow_row_relevant(row: dict[str, str], workflow: str) -> bool:
+    if row.get("country", "").strip() not in ENGLISH_MARKET_COUNTRIES:
+        return False
     if domain_key(row.get("website", "")) in WORKFLOW_BLOCKED_DOMAINS:
         return False
     if public_sector_domain(row.get("website", "")):
