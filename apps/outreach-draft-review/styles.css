@@ -298,11 +298,6 @@ select:focus-visible {
   accent-color: var(--green);
 }
 
-.clutter-detail,
-#draftTabs,
-#leadScore,
-#researchState { display: none !important; }
-
 .lead-pane {
   min-height: 0;
   display: flex;

@@ -2,12 +2,16 @@
   "use strict";
 
   const leads = Array.isArray(window.OUTREACH_DATA) ? window.OUTREACH_DATA : [];
+  const initialLead =
+    leads.find((lead) => Array.isArray(lead.drafts) && lead.drafts.length) ||
+    leads[0] ||
+    null;
   const state = {
     query: "",
     segment: "all",
     recipient: "all",
     country: "all",
-    selectedEmail: leads[0]?.email || "",
+    selectedEmail: initialLead?.email || "",
     draftIndex: 0,
   };
 
@@ -41,7 +45,6 @@
     offerName: document.getElementById("offerName"),
     priceRange: document.getElementById("priceRange"),
     location: document.getElementById("location"),
-    leadScore: document.getElementById("leadScore"),
     leadTags: document.getElementById("leadTags"),
     copyEmail: document.getElementById("copyEmail"),
     copyWebsite: document.getElementById("copyWebsite"),
@@ -97,9 +100,14 @@
   function currentLead(filtered) {
     return (
       filtered.find((lead) => lead.email === state.selectedEmail) ||
+      filtered.find((lead) => leadDrafts(lead).length) ||
       filtered[0] ||
       null
     );
+  }
+
+  function leadDrafts(lead) {
+    return Array.isArray(lead?.drafts) ? lead.drafts : [];
   }
 
   function render() {
@@ -112,7 +120,7 @@
 
     elements.leadTotal.textContent = String(leads.length);
     elements.draftTotal.textContent = String(
-      leads.reduce((total, item) => total + item.drafts.length, 0),
+      leads.reduce((total, item) => total + leadDrafts(item).length, 0),
     );
     elements.directTotal.textContent = String(
       leads.filter((lead) => lead.recipient_type === "decision_maker").length,
@@ -146,14 +154,21 @@
 
         const icon = document.createElement("span");
         icon.className = "lead-icon";
+        icon.textContent = initials(lead.business_name);
         const image = document.createElement("img");
-        image.src = faviconUrl(lead.website);
         image.alt = "";
+        image.hidden = true;
+        image.addEventListener("load", () => {
+          image.hidden = false;
+          icon.replaceChildren(image);
+        });
         image.addEventListener("error", () => {
           image.remove();
           icon.textContent = initials(lead.business_name);
         });
         icon.appendChild(image);
+        const iconUrl = faviconUrl(lead.website);
+        if (iconUrl) image.src = iconUrl;
 
         const copy = document.createElement("span");
         copy.className = "lead-copy";
@@ -188,7 +203,8 @@
   }
 
   function renderLead(lead) {
-    const draft = lead.drafts[state.draftIndex] || lead.drafts[0];
+    const drafts = leadDrafts(lead);
+    const draft = drafts[state.draftIndex] || drafts[0];
     const hasDraft = Boolean(draft);
     elements.companyName.textContent = lead.business_name;
     elements.companySegment.textContent = `${segmentLabel(lead.segment)} · ${recipientLabel(lead.recipient_type)}`;
@@ -196,20 +212,12 @@
       lead.recipient_type === "decision_maker"
         ? `${lead.name} · ${lead.title} · ${lead.email}`
         : `Business inbox · ${lead.email}`;
-    elements.companyInitials.textContent = initials(lead.business_name);
-    elements.companyFavicon.src = faviconUrl(lead.website);
-    elements.companyFavicon.hidden = false;
-    elements.companyInitials.hidden = true;
-    elements.companyFavicon.onerror = () => {
-      elements.companyFavicon.hidden = true;
-      elements.companyInitials.hidden = false;
-    };
+    renderCompanyIcon(lead);
     elements.websiteLink.href = lead.website;
     elements.offerName.textContent = lead.recommended_offer || "Growth build";
     elements.priceRange.textContent = lead.price_range || "—";
     elements.location.textContent =
       [lead.city, lead.country].filter(Boolean).join(", ") || "—";
-    elements.leadScore.textContent = lead.lead_score || "—";
     elements.leadTags.textContent = [segmentLabel(lead.segment), recipientLabel(lead.recipient_type)].join(" · ");
     elements.emailValue.value = lead.email || "—";
     elements.websiteValue.value = lead.website || "—";
@@ -230,7 +238,7 @@
         : "Website signal";
 
     elements.draftTabs.replaceChildren(
-      ...lead.drafts.map((item, index) => {
+      ...drafts.map((item, index) => {
         const tab = document.createElement("button");
         tab.type = "button";
         tab.className = `draft-tab${index === state.draftIndex ? " active" : ""}`;
@@ -257,7 +265,7 @@
         return node;
       }),
     );
-    elements.draftPosition.textContent = `Draft ${draft.number} of ${lead.drafts.length} · ${draft.label}`;
+    elements.draftPosition.textContent = `Draft ${draft.number} of ${drafts.length} · ${draft.label}`;
   }
 
   async function copyText(value, successMessage) {
@@ -278,7 +286,7 @@
 
   function selectedDraft() {
     const lead = leads.find((item) => item.email === state.selectedEmail);
-    return lead?.drafts[state.draftIndex] || null;
+    return leadDrafts(lead)[state.draftIndex] || null;
   }
 
   let toastTimer;
@@ -293,9 +301,51 @@
   }
 
   function refreshIcons() {
-    if (window.lucide) {
-      window.lucide.createIcons();
-    }
+    const iconMarkup = {
+      search: '<circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path>',
+      inbox: '<path d="M4 4h16v12H4z"></path><path d="M4 12h4l2 3h4l2-3h4"></path>',
+      "external-link": '<path d="M14 4h6v6"></path><path d="m20 4-9 9"></path><path d="M18 13v7H4V6h7"></path>',
+      "scan-search": '<path d="M3 7V3h4"></path><path d="M17 3h4v4"></path><path d="M21 17v4h-4"></path><path d="M7 21H3v-4"></path><circle cx="11" cy="11" r="4"></circle><path d="m14 14 3 3"></path>',
+      "shield-alert": '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path>',
+      copy: '<rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path>',
+    };
+    document.querySelectorAll("i[data-lucide]").forEach((placeholder) => {
+      const name = placeholder.dataset.lucide;
+      const markup = iconMarkup[name];
+      if (!markup) return;
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", "0 0 24 24");
+      svg.setAttribute("fill", "none");
+      svg.setAttribute("stroke", "currentColor");
+      svg.setAttribute("stroke-width", "2");
+      svg.setAttribute("stroke-linecap", "round");
+      svg.setAttribute("stroke-linejoin", "round");
+      svg.setAttribute("aria-hidden", "true");
+      svg.dataset.icon = name;
+      svg.innerHTML = markup;
+      placeholder.replaceWith(svg);
+    });
+  }
+
+  function renderCompanyIcon(lead) {
+    const fallback = initials(lead.business_name) || "—";
+    const iconUrl = faviconUrl(lead.website);
+    elements.companyInitials.textContent = fallback;
+    elements.companyInitials.hidden = false;
+    elements.companyFavicon.hidden = true;
+    elements.companyFavicon.onload = null;
+    elements.companyFavicon.onerror = null;
+    elements.companyFavicon.removeAttribute("src");
+    if (!iconUrl) return;
+    elements.companyFavicon.onload = () => {
+      elements.companyFavicon.hidden = false;
+      elements.companyInitials.hidden = true;
+    };
+    elements.companyFavicon.onerror = () => {
+      elements.companyFavicon.hidden = true;
+      elements.companyInitials.hidden = false;
+    };
+    elements.companyFavicon.src = iconUrl;
   }
 
   function faviconUrl(website) {
