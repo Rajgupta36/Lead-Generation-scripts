@@ -37,9 +37,11 @@
     priceRange: document.getElementById("priceRange"),
     location: document.getElementById("location"),
     leadTags: document.getElementById("leadTags"),
+    copyEmail: document.getElementById("copyEmail"),
     copyWebsite: document.getElementById("copyWebsite"),
     copyClient: document.getElementById("copyClient"),
     copyCountry: document.getElementById("copyCountry"),
+    emailValue: document.getElementById("emailValue"),
     websiteValue: document.getElementById("websiteValue"),
     clientValue: document.getElementById("clientValue"),
     countryValue: document.getElementById("countryValue"),
@@ -192,9 +194,11 @@
     elements.location.textContent =
       [lead.city, lead.country].filter(Boolean).join(", ") || "—";
     elements.leadTags.textContent = [segmentLabel(lead.segment), recipientLabel(lead.recipient_type)].join(" · ");
+    elements.emailValue.value = lead.email || "—";
     elements.websiteValue.value = lead.website || "—";
     elements.clientValue.value = lead.business_name || "—";
     elements.countryValue.value = lead.country || "—";
+    elements.copyEmail.disabled = !lead.email;
     elements.copyWebsite.disabled = !lead.website;
     elements.copyClient.disabled = !lead.business_name;
     elements.copyCountry.disabled = !lead.country;
@@ -415,6 +419,11 @@
     if (!button) return;
     state.selectedEmail = button.dataset.email;
     render();
+  });
+
+  elements.copyEmail.addEventListener("click", () => {
+    const lead = currentLead(filteredLeads());
+    if (lead?.email) copyText(lead.email, "Email copied");
   });
 
   elements.copyWebsite.addEventListener("click", () => {

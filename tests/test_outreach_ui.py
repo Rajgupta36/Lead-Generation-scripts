@@ -48,10 +48,12 @@ class OutreachUiTests(unittest.TestCase):
         self.assertIn('"ArrowLeft"', self.javascript)
         self.assertIn("nexstudio-lead-pane-width-v1", self.javascript)
 
-    def test_right_pane_is_signal_only(self):
+    def test_right_pane_has_signal_and_email_copy_only(self):
         self.assertIn('id="observation"', self.html)
+        self.assertIn('id="emailValue"', self.html)
+        self.assertIn('id="copyEmail"', self.html)
+        self.assertIn('elements.copyEmail.addEventListener("click"', self.javascript)
         for removed_id in (
-            "emailValue",
             "mailDone",
             "followupDone",
             "draftTabs",
