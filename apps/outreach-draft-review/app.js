@@ -241,6 +241,7 @@
     const iconMarkup = {
       search: '<circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path>',
       inbox: '<path d="M4 4h16v12H4z"></path><path d="M4 12h4l2 3h4l2-3h4"></path>',
+      mail: '<rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path>',
       "external-link": '<path d="M14 4h6v6"></path><path d="m20 4-9 9"></path><path d="M18 13v7H4V6h7"></path>',
       "scan-search": '<path d="M3 7V3h4"></path><path d="M17 3h4v4"></path><path d="M21 17v4h-4"></path><path d="M7 21H3v-4"></path><circle cx="11" cy="11" r="4"></circle><path d="m14 14 3 3"></path>',
     };

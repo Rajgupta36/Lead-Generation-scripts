@@ -262,10 +262,69 @@ body.is-resizing-panes {
   user-select: none;
 }
 
+.email-copy-section {
+  margin: 18px 24px 0;
+  padding: 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 7px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.email-copy-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.email-copy-heading > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink);
+}
+
+.email-copy-heading svg {
+  width: 16px;
+  height: 16px;
+  color: var(--green);
+}
+
+.email-copy-field .copy-input {
+  padding: 10px 12px;
+  background: var(--surface-muted);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.email-copy-field .copy-button {
+  min-width: 92px;
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.email-copy-field .copy-button:hover {
+  background: #18583c;
+  border-color: #18583c;
+}
+
+.email-copy-field .copy-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .compact-details {
   display: grid;
   gap: 8px;
-  margin: 18px 24px 0;
+  margin: 12px 24px 0;
 }
 
 .detail-row {

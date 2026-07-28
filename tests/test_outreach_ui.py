@@ -19,6 +19,7 @@ class OutreachUiTests(unittest.TestCase):
         for icon_name in (
             "search",
             "inbox",
+            "mail",
             "external-link",
             "scan-search",
         ):
@@ -52,6 +53,9 @@ class OutreachUiTests(unittest.TestCase):
         self.assertIn('id="observation"', self.html)
         self.assertIn('id="emailValue"', self.html)
         self.assertIn('id="copyEmail"', self.html)
+        self.assertIn('class="email-copy-section"', self.html)
+        self.assertIn("Copy email", self.html)
+        self.assertIn(".email-copy-section", self.stylesheet)
         self.assertIn('elements.copyEmail.addEventListener("click"', self.javascript)
         for removed_id in (
             "mailDone",

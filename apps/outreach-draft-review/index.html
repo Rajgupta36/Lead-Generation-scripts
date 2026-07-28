@@ -152,10 +152,23 @@
               </div>
             </div>
 
+            <section class="email-copy-section" aria-labelledby="emailCopyHeading">
+              <div class="email-copy-heading">
+                <div>
+                  <i data-lucide="mail" aria-hidden="true"></i>
+                  <span id="emailCopyHeading">Email</span>
+                </div>
+                <span>Ready to paste</span>
+              </div>
+              <div class="copy-field email-copy-field">
+                <input id="emailValue" class="copy-input" aria-label="Lead email address" readonly />
+                <button type="button" class="copy-button" id="copyEmail">Copy email</button>
+              </div>
+            </section>
+
             <div class="compact-details" aria-label="Lead details">
               <div class="detail-row"><span>Client</span><div class="copy-field"><input id="clientValue" class="copy-input" readonly /><button type="button" class="copy-button" id="copyClient">Copy</button></div></div>
               <div class="detail-row"><span>Country</span><div class="copy-field"><input id="countryValue" class="copy-input" readonly /><button type="button" class="copy-button" id="copyCountry">Copy</button></div></div>
-              <div class="detail-row"><span>Email</span><div class="copy-field"><input id="emailValue" class="copy-input" readonly /><button type="button" class="copy-button" id="copyEmail">Copy</button></div></div>
               <div class="detail-row"><span>Website</span><div class="copy-field"><input id="websiteValue" class="copy-input" readonly /><button type="button" class="copy-button" id="copyWebsite">Copy</button></div></div>
             </div>
 
