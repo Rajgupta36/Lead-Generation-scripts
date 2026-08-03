@@ -3,14 +3,24 @@ import { prisma } from "@nexstudio/db";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const organization = await prisma.organization.findUnique({ where: { slug: "nexstudio-local" } });
-  const organizationId = organization?.id ?? "";
-  const [companies, qualified, drafts, sent] = organizationId ? await Promise.all([
-    prisma.company.count({ where: { organizationId } }),
-    prisma.company.count({ where: { organizationId, leadStatus: { in: ["QUALIFIED", "REVIEW", "APPROVED", "CONTACTED", "REPLIED", "CONVERTED"] } } }),
-    prisma.emailSent.count({ where: { status: "DRAFT", contact: { company: { organizationId } } } }),
-    prisma.emailSent.count({ where: { status: { in: ["SENT", "DELIVERED", "REPLIED"] }, contact: { company: { organizationId } } } })
-  ]) : [0, 0, 0, 0];
+  let organization: { id: string; name: string } | null = null;
+  let databaseError = false;
+  let companies = 0;
+  let qualified = 0;
+  let drafts = 0;
+  let sent = 0;
+  try {
+    organization = await prisma.organization.findUnique({ where: { slug: "nexstudio-local" }, select: { id: true, name: true } });
+    const organizationId = organization?.id ?? "";
+    if (organizationId) [companies, qualified, drafts, sent] = await Promise.all([
+      prisma.company.count({ where: { organizationId } }),
+      prisma.company.count({ where: { organizationId, leadStatus: { in: ["QUALIFIED", "REVIEW", "APPROVED", "CONTACTED", "REPLIED", "CONVERTED"] } } }),
+      prisma.emailSent.count({ where: { status: "DRAFT", contact: { company: { organizationId } } } }),
+      prisma.emailSent.count({ where: { status: { in: ["SENT", "DELIVERED", "REPLIED"] }, contact: { company: { organizationId } } } })
+    ]);
+  } catch {
+    databaseError = true;
+  }
   const cards = [["Apollo companies", companies, "All imported companies"], ["Qualified leads", qualified, "After website audit and scoring"], ["Review queue", drafts, "Drafts waiting for approval"], ["Emails sent", sent, "No emails are sent automatically"]];
   return (
     <main style={{ maxWidth: 1180, margin: "0 auto", padding: "72px 28px" }}>
@@ -19,6 +29,7 @@ export default async function DashboardPage() {
       <p style={{ color: "#aab4d1", maxWidth: 640, lineHeight: 1.7 }}>
         Discover targeted companies in Apollo, identify decision makers, audit their websites, and move only qualified opportunities into human-reviewed outreach.
       </p>
+      {databaseError && <p style={{ border: "1px solid #7f4b4b", borderRadius: 10, padding: 14, color: "#ffb4b4" }}>Database is not connected. Add a production `DATABASE_URL` in Vercel, then redeploy. Local Docker databases are not reachable from Vercel.</p>}
       <section style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginTop: 42 }}>
         {cards.map(([label, value, detail]) => (
           <article key={label} style={{ border: "1px solid #273252", borderRadius: 14, padding: 20, background: "#11182d" }}>
