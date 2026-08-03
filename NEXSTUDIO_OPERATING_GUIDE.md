@@ -107,4 +107,4 @@ pnpm test
 pnpm --filter @nexstudio/web build
 ```
 
-Vercel deploys from the repository root using `vercel.json`; the root package includes Next.js so Vercel can detect the framework. The BullMQ worker must run separately on Railway or Fly.io.
+Vercel deploys from the repository root using `vercel.json`; the root package includes Next.js so Vercel can detect the framework. The full Turborepo build runs first so workspace packages such as Prisma and BullMQ are compiled before Next.js bundles the web app. The BullMQ worker must run separately on Railway or Fly.io.
