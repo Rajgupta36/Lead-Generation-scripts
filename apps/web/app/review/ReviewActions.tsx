@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export function ReviewActions({ emailId }: { emailId: string }) {
+export function ReviewActions({ emailId, recipient, subject, body }: { emailId: string; recipient: string; subject: string; body: string }) {
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
   async function act(payload: { approve: boolean; verifyContact?: boolean; sendNow?: boolean }) {
@@ -15,10 +15,16 @@ export function ReviewActions({ emailId }: { emailId: string }) {
     } catch (error) { setStatus(error instanceof Error ? error.message : "Action failed"); }
     finally { setBusy(false); }
   }
+  async function approveAndCopy() {
+    await act({ approve: true, verifyContact: true });
+    await navigator.clipboard.writeText(`To: ${recipient}\nSubject: ${subject}\n\n${body}`);
+    setStatus("Approved and copied");
+  }
   return <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
     <button disabled={busy} onClick={() => act({ approve: true })}>Approve draft</button>
-    <button disabled={busy} onClick={() => act({ approve: true, verifyContact: true, sendNow: true })}>Verify &amp; queue send</button>
+    <button disabled={busy} onClick={approveAndCopy}>Approve &amp; copy email</button>
+    <a href={`mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`}>Open mail app</a>
     <button disabled={busy} onClick={() => act({ approve: false })}>Reject</button>
-    {status && <span style={{ color: status === "Queued for sending" ? "#8ff0bd" : "#aab4d1", fontSize: 13 }}>{status}</span>}
+    {status && <span style={{ color: status === "Approved and copied" ? "#8ff0bd" : "#aab4d1", fontSize: 13 }}>{status}</span>}
   </div>;
 }

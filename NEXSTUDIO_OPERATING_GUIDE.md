@@ -92,6 +92,7 @@ Do not use local Docker PostgreSQL or Redis URLs in Vercel. Vercel cannot run th
 ## Safety rules
 
 - Never send automatically from a newly imported CSV.
+- Manual mode uses the review queue to copy drafts into Gmail/Outlook; Redis is optional for this mode.
 - Never send to `info@`, `support@`, `sales@`, `contact@`, or `hello@` without explicit approval.
 - Keep all drafts in `DRAFT` until a human approves them.
 - Do not add another lead source unless it improves targeting quality.

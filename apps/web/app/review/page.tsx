@@ -15,7 +15,7 @@ export default async function ReviewPage() {
       <h2 style={{ fontSize: 20 }}>{draft.subject}</h2>
       <pre style={{ whiteSpace: "pre-wrap", font: "inherit", color: "#d8def5", lineHeight: 1.7 }}>{draft.body}</pre>
       <div style={{ color: "#667394", fontSize: 12, marginBottom: 16 }}>Status: {draft.status} · Draft ID: {draft.id}</div>
-      <ReviewActions emailId={draft.id} />
+      <ReviewActions emailId={draft.id} recipient={draft.contact.email ?? ""} subject={draft.subject} body={draft.body} />
     </article>)}
   </main>;
 }
