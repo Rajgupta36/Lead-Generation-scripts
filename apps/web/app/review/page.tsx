@@ -1,4 +1,5 @@
 import { prisma } from "@nexstudio/db";
+import { ReviewActions } from "./ReviewActions";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,8 @@ export default async function ReviewPage() {
       <div style={{ color: "#9daaff", fontSize: 13 }}>{draft.contact.company.companyName} · {draft.contact.fullName} · {draft.contact.email}</div>
       <h2 style={{ fontSize: 20 }}>{draft.subject}</h2>
       <pre style={{ whiteSpace: "pre-wrap", font: "inherit", color: "#d8def5", lineHeight: 1.7 }}>{draft.body}</pre>
-      <div style={{ color: "#667394", fontSize: 12 }}>Status: {draft.status} · Draft ID: {draft.id}</div>
+      <div style={{ color: "#667394", fontSize: 12, marginBottom: 16 }}>Status: {draft.status} · Draft ID: {draft.id}</div>
+      <ReviewActions emailId={draft.id} />
     </article>)}
   </main>;
 }
