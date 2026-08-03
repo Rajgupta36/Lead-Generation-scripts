@@ -9,6 +9,7 @@ export default async function DashboardPage() {
   let qualified = 0;
   let drafts = 0;
   let sent = 0;
+  const databaseConfigured = Boolean(process.env.DATABASE_URL);
   try {
     organization = await prisma.organization.findUnique({ where: { slug: "nexstudio-local" }, select: { id: true, name: true } });
     const organizationId = organization?.id ?? "";
@@ -29,7 +30,7 @@ export default async function DashboardPage() {
       <p style={{ color: "#aab4d1", maxWidth: 640, lineHeight: 1.7 }}>
         Discover targeted companies in Apollo, identify decision makers, audit their websites, and move only qualified opportunities into human-reviewed outreach.
       </p>
-      {databaseError && <p style={{ border: "1px solid #7f4b4b", borderRadius: 10, padding: 14, color: "#ffb4b4" }}>Database is not connected. Add a production `DATABASE_URL` in Vercel, then redeploy. Local Docker databases are not reachable from Vercel.</p>}
+      {databaseError && <p style={{ border: "1px solid #7f4b4b", borderRadius: 10, padding: 14, color: "#ffb4b4" }}>{databaseConfigured ? "DATABASE_URL is present, but PostgreSQL is unreachable or the Prisma schema has not been applied. Verify the hosted database allows connections from Vercel and run Prisma db push, then redeploy." : "DATABASE_URL is missing from this deployment. Add it to the Vercel environment used by this deployment, then redeploy."}</p>}
       <section style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginTop: 42 }}>
         {cards.map(([label, value, detail]) => (
           <article key={label} style={{ border: "1px solid #273252", borderRadius: 14, padding: 20, background: "#11182d" }}>
