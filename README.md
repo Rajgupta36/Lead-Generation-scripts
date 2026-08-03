@@ -21,6 +21,7 @@ cp .env.example .env
 docker compose -f infra/docker-compose.yml up -d
 pnpm install
 pnpm --filter @nexstudio/db db:generate
+pnpm db:push
 pnpm --filter @nexstudio/web dev
 ```
 
