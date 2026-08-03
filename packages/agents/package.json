@@ -1,0 +1,22 @@
+{
+  "name": "@nexstudio/agents",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "exports": { ".": { "types": "./src/index.ts", "import": "./dist/index.js", "default": "./dist/index.js" } },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@nexstudio/core": "workspace:*",
+    "@nexstudio/db": "workspace:*",
+    "@nexstudio/observability": "workspace:*",
+    "@nexstudio/providers": "workspace:*",
+    "@nexstudio/queues": "workspace:*",
+    "@prisma/client": "^6.0.0"
+  }
+}

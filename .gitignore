@@ -6,12 +6,12 @@
 node_modules/
 .pnpm-store/
 .turbo/
+.next/
+dist/
+*.tsbuildinfo
 
 __pycache__/
 *.py[cod]
 
 data/
-apps/outreach-draft-review/data.js
-!apps/outreach-draft-review/data.js
-
 *.log

@@ -1,7 +1,0 @@
-{
-  "name": "@leadgen/personalized-audit-report-flow",
-  "private": true,
-  "scripts": {
-    "generate": "python3 ../../scripts/generate-audit-reports.py --input-dir ../../data/output-website-opportunity-flow --out ../../data/reports/personalized-audit-report-flow"
-  }
-}

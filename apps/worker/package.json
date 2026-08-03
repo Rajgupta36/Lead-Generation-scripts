@@ -1,0 +1,23 @@
+{
+  "name": "@nexstudio/worker",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@nexstudio/agents": "workspace:*",
+    "@nexstudio/core": "workspace:*",
+    "@nexstudio/db": "workspace:*",
+    "@nexstudio/observability": "workspace:*",
+    "@nexstudio/providers": "workspace:*",
+    "@nexstudio/queues": "workspace:*",
+    "bullmq": "^5.0.0"
+  },
+  "devDependencies": { "tsx": "^4.19.2" }
+}

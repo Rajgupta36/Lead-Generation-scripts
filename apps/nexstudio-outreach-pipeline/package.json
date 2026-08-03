@@ -1,7 +1,0 @@
-{
-  "name": "@leadgen/nexstudio-outreach-pipeline",
-  "private": true,
-  "scripts": {
-    "generate": "python3 ../../scripts/run-nexstudio-pipeline.py"
-  }
-}

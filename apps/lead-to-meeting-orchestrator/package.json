@@ -1,7 +1,0 @@
-{
-  "name": "@leadgen/lead-to-meeting-orchestrator",
-  "private": true,
-  "scripts": {
-    "generate": "python3 ../../scripts/run-meeting-orchestrator.py --input-dir ../../data/output-website-opportunity-flow --out ../../data/output-lead-to-meeting-orchestrator --max-leads 100"
-  }
-}

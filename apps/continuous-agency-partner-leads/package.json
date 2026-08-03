@@ -1,7 +1,0 @@
-{
-  "name": "@leadgen/continuous-agency-partner-leads",
-  "private": true,
-  "scripts": {
-    "generate": "python3 ../../scripts/run-continuous-workflow.py --workflow agency_partners"
-  }
-}

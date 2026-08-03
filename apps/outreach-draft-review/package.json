@@ -1,7 +1,0 @@
-{
-  "name": "@leadgen/outreach-draft-review",
-  "private": true,
-  "scripts": {
-    "generate": "python3 ../../scripts/generate-outreach-drafts.py"
-  }
-}

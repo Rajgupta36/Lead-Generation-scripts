@@ -3,32 +3,20 @@
   "private": true,
   "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "generate": "turbo run generate",
-    "generate:maps": "turbo run generate --filter=@leadgen/google-maps-local-flow",
-    "generate:apollo": "turbo run generate --filter=@leadgen/apollo-enriched-dork-flow",
-    "generate:directories": "turbo run generate --filter=@leadgen/niche-directory-seed-flow",
-    "generate:opportunities": "turbo run generate --filter=@leadgen/website-opportunity-flow",
-    "generate:lookalikes": "turbo run generate --filter=@leadgen/lookalike-seed-flow",
-    "generate:x-founders": "turbo run generate --filter=@leadgen/x-premium-founder-flow",
-    "generate:audits": "turbo run generate --filter=@leadgen/personalized-audit-report-flow",
-    "generate:meetings": "turbo run generate --filter=@leadgen/lead-to-meeting-orchestrator",
-    "generate:nexstudio": "turbo run generate --filter=@leadgen/nexstudio-outreach-pipeline",
-    "generate:americas": "python3 scripts/run-americas-campaign.py",
-    "generate:americas-email": "python3 scripts/run-americas-email-campaign.py",
-    "enrich:decision-makers": "python3 scripts/enrich-decision-makers.py",
-    "review:decision-makers": "python3 scripts/review-decision-makers.py",
-    "generate:drafts": "turbo run generate --filter=@leadgen/outreach-draft-review",
-    "generate:business-leads": "turbo run generate --filter=@leadgen/continuous-business-leads",
-    "generate:coach-leads": "turbo run generate --filter=@leadgen/continuous-coach-leads",
-    "generate:agency-partner-leads": "turbo run generate --filter=@leadgen/continuous-agency-partner-leads",
-    "generate:lead-workflows": "turbo run generate --filter=@leadgen/continuous-business-leads --filter=@leadgen/continuous-coach-leads --filter=@leadgen/continuous-agency-partner-leads --concurrency=3 && python3 scripts/refresh-continuous-output.py",
-    "lead-loop": "python3 scripts/run-lead-loop.py",
-    "lead-loop:once": "python3 scripts/run-lead-loop.py --once",
-    "lead-loop:install": "python3 scripts/install-lead-loop.py",
-    "generate:nextstudio": "pnpm generate:nexstudio",
-    "test": "python3 -m unittest discover -s tests"
+    "test": "pnpm typecheck",
+    "dev": "turbo run dev",
+    "dev:web": "pnpm --filter @nexstudio/web dev",
+    "dev:worker": "pnpm --filter @nexstudio/worker dev",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "db:generate": "pnpm --filter @nexstudio/db db:generate",
+    "db:migrate": "pnpm --filter @nexstudio/db db:migrate",
+    "deploy:web": "pnpm --filter @nexstudio/web build"
   },
   "devDependencies": {
-    "turbo": "^2.5.4"
+    "@types/node": "^22.0.0",
+    "turbo": "^2.5.4",
+    "typescript": "^5.6.3"
   }
 }

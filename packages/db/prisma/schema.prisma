@@ -1,0 +1,272 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CompanyStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum VerificationStatus {
+  UNKNOWN
+  VALID
+  INVALID
+  RISKY
+}
+
+enum LeadStatus {
+  NEW
+  QUALIFIED
+  REVIEW
+  APPROVED
+  CONTACTED
+  REPLIED
+  CONVERTED
+  UNSUBSCRIBED
+  DISQUALIFIED
+}
+
+enum SequenceStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+enum EmailStatus {
+  DRAFT
+  APPROVED
+  SCHEDULED
+  SENT
+  DELIVERED
+  BOUNCED
+  REPLIED
+  UNSUBSCRIBED
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users     User[]
+  companies Company[]
+  sequences EmailSequence[]
+  runs      ApolloSearchRun[]
+}
+
+model User {
+  id             String       @id @default(cuid())
+  organizationId String
+  email          String
+  name           String?
+  createdAt      DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  @@unique([organizationId, email])
+}
+
+model Company {
+  id             String         @id @default(cuid())
+  organizationId String
+  domain         String
+  companyName    String
+  industry       String?
+  employees      Int?
+  location       String?
+  linkedinUrl    String?
+  founded        Int?
+  revenue        String?
+  techStack      Json?
+  websiteStatus  String?
+  aiSummary      String?
+  aiPainPoints   Json?
+  recommendedServices Json?
+  estimatedProjectValue Int?
+  reasonsToContact Json?
+  status         CompanyStatus   @default(ACTIVE)
+  leadStatus     LeadStatus      @default(NEW)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  contacts       Contact[]
+  audits         WebsiteAudit[]
+  scores         LeadScore[]
+  sources        ApolloCompany[]
+  @@unique([organizationId, domain])
+  @@index([organizationId, leadStatus])
+}
+
+model ApolloSearchRun {
+  id             String           @id @default(cuid())
+  organizationId String
+  name           String
+  filters        Json
+  status         String           @default("queued")
+  resultCount    Int              @default(0)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  companies      ApolloCompany[]
+  @@index([organizationId, createdAt])
+}
+
+model ApolloCompany {
+  id        String         @id @default(cuid())
+  runId     String
+  companyId String
+  sourceId  String?
+  payload   Json
+  run       ApolloSearchRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  company   Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  @@unique([runId, companyId])
+}
+
+model Contact {
+  id                 String             @id @default(cuid())
+  companyId          String
+  fullName           String
+  role               String
+  linkedinUrl        String?
+  email              String?
+  verificationStatus VerificationStatus @default(UNKNOWN)
+  confidence         Int                @default(0)
+  source             String
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  company            Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  emails             EmailSent[]
+  @@index([companyId, verificationStatus])
+}
+
+model WebsiteAudit {
+  id                  String   @id @default(cuid())
+  companyId           String
+  url                 String
+  pagespeedScore      Int?
+  lighthouseScore     Int?
+  ttfbMs              Int?
+  cls                 Float?
+  lcpMs               Int?
+  fcpMs               Int?
+  accessibilityScore  Int?
+  seoScore            Int?
+  brokenLinks         Int?
+  missingMetadata     Json?
+  techStack           Json?
+  cms                 String?
+  hosting             String?
+  cookieBanner        Boolean?
+  hasForms            Boolean?
+  contactFormStatus   String?
+  hasBlog             Boolean?
+  mobileResponsive   Boolean?
+  screenshotUrl       String?
+  raw                 Json?
+  createdAt           DateTime @default(now())
+  company             Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  @@index([companyId, createdAt])
+}
+
+model LeadScore {
+  id         String   @id @default(cuid())
+  companyId  String
+  score      Int
+  factors    Json
+  rationale  String?
+  createdAt  DateTime @default(now())
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  @@index([companyId, score])
+}
+
+model EmailSequence {
+  id             String         @id @default(cuid())
+  organizationId String
+  name           String
+  status         SequenceStatus  @default(DRAFT)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  templates      EmailTemplate[]
+  emails         EmailSent[]
+}
+
+model EmailTemplate {
+  id         String        @id @default(cuid())
+  sequenceId String
+  step       Int
+  subject    String
+  body       String
+  delayDays  Int           @default(0)
+  sequence   EmailSequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  @@unique([sequenceId, step])
+}
+
+model EmailSent {
+  id          String        @id @default(cuid())
+  contactId   String
+  sequenceId  String?
+  subject     String
+  body        String
+  status      EmailStatus   @default(DRAFT)
+  providerId  String?
+  scheduledAt DateTime?
+  sentAt      DateTime?
+  createdAt   DateTime      @default(now())
+  contact     Contact      @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  sequence    EmailSequence? @relation(fields: [sequenceId], references: [id], onDelete: SetNull)
+  replies     Reply[]
+  events      EmailEvent[]
+  @@index([contactId, status])
+}
+
+model Reply {
+  id         String    @id @default(cuid())
+  emailId    String
+  providerId String?
+  body       String
+  receivedAt DateTime  @default(now())
+  email      EmailSent @relation(fields: [emailId], references: [id], onDelete: Cascade)
+}
+
+model EmailEvent {
+  id         String    @id @default(cuid())
+  emailId    String
+  type       String
+  providerId String?
+  metadata   Json?
+  occurredAt DateTime  @default(now())
+  email      EmailSent @relation(fields: [emailId], references: [id], onDelete: Cascade)
+  @@index([emailId, type, occurredAt])
+}
+
+model Task {
+  id             String   @id @default(cuid())
+  organizationId String
+  type           String
+  payload        Json
+  status         String   @default("open")
+  dueAt          DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([organizationId, status, dueAt])
+}
+
+model Job {
+  id          String   @id @default(cuid())
+  queueName   String
+  externalId  String?
+  type        String
+  status      String
+  attempts    Int      @default(0)
+  payload     Json
+  error       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([queueName, status, createdAt])
+}

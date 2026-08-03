@@ -1,0 +1,41 @@
+services:
+  web:
+    build:
+      context: ..
+      target: web
+    env_file:
+      - ../.env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - redis
+  worker:
+    build:
+      context: ..
+      target: worker
+    env_file:
+      - ../.env
+    depends_on:
+      - postgres
+      - redis
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: nexstudio
+      POSTGRES_PASSWORD: nexstudio
+      POSTGRES_DB: nexstudio
+    ports:
+      - "55432:5432"
+    volumes:
+      - nexstudio-postgres:/var/lib/postgresql/data
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - nexstudio-redis:/data
+
+volumes:
+  nexstudio-postgres:
+  nexstudio-redis:

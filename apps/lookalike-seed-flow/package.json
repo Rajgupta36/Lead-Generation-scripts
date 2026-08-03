@@ -1,7 +1,0 @@
-{
-  "name": "@leadgen/lookalike-seed-flow",
-  "private": true,
-  "scripts": {
-    "generate": "python3 ../../scripts/run-flow.py ./flow.json"
-  }
-}
