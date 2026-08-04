@@ -14,7 +14,11 @@ export class ApolloPipelineService {
   constructor() {
     const env = getEnv();
     this.apollo = env.APOLLO_API_KEY ? new ApolloProvider({ apiKey: env.APOLLO_API_KEY, baseUrl: env.APOLLO_BASE_URL }) : undefined;
-    this.ai = new AIProvider(env.OPENAI_API_KEY);
+    this.ai = new AIProvider(env.OPENAI_API_KEY, fetch, {
+      senderName: env.OUTREACH_SENDER_NAME,
+      calLink: env.OUTREACH_CAL_LINK,
+      websiteUrl: env.OUTREACH_WEBSITE_URL
+    });
     this.auditor = new WebsiteAuditProvider();
   }
 

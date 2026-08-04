@@ -9,6 +9,9 @@ const envSchema = z.object({
   OPENAI_API_KEY: z.string().min(1).optional(),
   RESEND_API_KEY: z.string().min(1).optional(),
   OUTREACH_FROM_EMAIL: z.string().email().optional(),
+  OUTREACH_SENDER_NAME: z.string().min(1).default("Raj Gupta"),
+  OUTREACH_CAL_LINK: z.string().url().default("https://cal.com/nexstudio"),
+  OUTREACH_WEBSITE_URL: z.string().url().default("https://www.nexstudio.work/"),
   NEXTAUTH_SECRET: z.string().min(32).optional(),
   NEXTAUTH_URL: z.string().url().default("http://localhost:3000")
 });
