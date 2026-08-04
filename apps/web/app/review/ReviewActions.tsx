@@ -24,6 +24,7 @@ export function ReviewActions({ emailId, recipient, subject, body }: { emailId: 
     <button disabled={busy} onClick={() => act({ approve: true })}>Approve draft</button>
     <button disabled={busy} onClick={approveAndCopy}>Approve &amp; copy email</button>
     <a href={`mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`}>Open mail app</a>
+    <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`} target="_blank" rel="noreferrer">Open Gmail compose</a>
     <button disabled={busy} onClick={() => act({ approve: false })}>Reject</button>
     {status && <span style={{ color: status === "Approved and copied" ? "#8ff0bd" : "#aab4d1", fontSize: 13 }}>{status}</span>}
   </div>;

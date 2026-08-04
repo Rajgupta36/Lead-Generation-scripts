@@ -37,7 +37,7 @@ Open:
 - Audit reports: http://localhost:3000/audits
 - Draft review: http://localhost:3000/review
 
-Manual outreach does not require Redis, Resend, or a worker. In the review queue, use **Approve & copy email** or **Open mail app**, then send from Gmail or Outlook. Redis and the worker are only needed for queued delivery and automated follow-ups.
+Manual outreach does not require Redis, Resend, or a worker. In the review queue, use **Open Gmail compose** or **Approve & copy email**, then click Gmail's final **Send** button. Redis and the worker are only needed for queued delivery and automated follow-ups.
 
 ## Validation
 
